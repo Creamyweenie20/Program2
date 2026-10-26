@@ -1,0 +1,39 @@
+A = B + C
+
+foo_0 = X + Y
+
+foo_1 = foo_0 + Y
+
+foo_2 = foo_1 + A
+
+D = A * foo_2
+
+foo_3 = D - foo_1
+
+foo_4 = foo_3 + Y
+
+E = foo_4 * D
+
+foo_5 = E - foo_2
+
+foo_6 = foo_5 + foo_3
+
+foo_7 = foo_4 * foo_6
+
+foo_8 = foo_7 - E
+
+F = foo_8 + foo_5
+
+foo_9 = F * foo_7
+
+foo_10 = foo_9 - foo_6
+
+foo_11 = foo_10 + F
+
+foo_12 = foo_11 * foo_8
+
+foo_13 = foo_12 - foo_9
+
+foo_14 = foo_13 + foo_10
+
+foo_15 = foo_14 * foo_11
