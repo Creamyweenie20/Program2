@@ -3,7 +3,9 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, QV
 from logic_synth.gui import MainWindow, FileWindow
 from PySide6.QtGui import QGuiApplication, QFont
 from func import singleStaticAssign
+from Dag import Node, DAG
 import os 
+from dag_view import DagView
 
 class LogicSynthesis(QPushButton):
     def __init__(self, text = "Logic Synthesis", parent = None):
@@ -32,6 +34,7 @@ class HardwareSynthesis(QPushButton):
         super().__init__(text, parent)
         self._window = None
         self.clicked.connect(self.open)
+        self.text = None
 
     def open(self):
         if self._window is None:
@@ -103,21 +106,84 @@ class HardwareSynthesis(QPushButton):
             )
 
     def ssa(self, path): 
-        text = singleStaticAssign(path)
-        self._window.prompt.setText(f"Your Single Static Assignments are: \n \n {text}")
+        self.text = singleStaticAssign(path)
+        self._window.prompt.setText(f"Your Single Static Assignments are: \n \n {self.text}")
         self._window.prompt.setWordWrap(True)
         self._window.prompt.setAlignment(Qt.AlignCenter)
 
-        scrollArea = QScrollArea()
-        scrollArea.setWidgetResizable(True)
-        scrollArea.setAlignment(Qt.AlignCenter)
+
+
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setAlignment(Qt.AlignCenter)
         layout = self._window.centralWidget().layout()
         layout.removeWidget(self._window.prompt)
-        scrollArea.setWidget(self._window.prompt)
-        layout.insertWidget(0, scrollArea)
+
+        layout.removeWidget(self._window.browse_button)
+        self._window.browse_button.deleteLater()
+
+        self.button_row = QHBoxLayout()
+        self.actions = ['Export', "Continue"]
+        for action in self.actions: 
+            button = QPushButton(action)
+            button.clicked.connect(
+                lambda _checked = False, l = action: self.action_button(l)
+            )
+            self.button_row.addWidget(button)
+
+        layout.addLayout(self.button_row)
+
+        self.scrollArea.setWidget(self._window.prompt)
+        layout.insertWidget(0, self.scrollArea)
         
+    def action_button(self, action):
+
+        if action == "Export":
+            self._window.prompt.setText(
+                f"The Single Static Assignment: \n \n  {self.text} \n \n is saved to SSA.txt"
+            )
+            with open("SSA.txt", "w") as f:
+                f.write(self.text)
+
+            layout = self._window.centralWidget().layout()
+            layout.removeWidget(self._window.prompt)
+            self.clear_buttons(layout)
+
+            self.button_row = QHBoxLayout()
+            button = QPushButton("Continue")
+            button.clicked.connect(
+                lambda _checked=False: self.action_button("Continue")
+            )
+            self.button_row.addWidget(button)
+            layout.addLayout(self.button_row)
+
+            self.scrollArea.setWidget(self._window.prompt)
+            layout.insertWidget(0, self.scrollArea)
+
+        elif action == "Continue":
+            dag = DAG()
+            for line in self.text.strip().splitlines():
+                if line.strip() == "":
+                    continue
+                dag.add_statemnt(line.strip())
+
+            dag.save_json("DAG.json")
+
+            layout = self._window.centralWidget().layout()
+            self.clear_buttons(layout)            
+            self.scrollArea.hide()                
+
+            self.dag_view = DagView(dag)
+            layout.insertWidget(0, self.dag_view)
+            self.dag_view.fit()
 
 
+
+    def clear_buttons(self, layout):
+        while self.button_row.count():
+            self.button_row.takeAt(0).widget().deleteLater()
+        # Removes the row full of empty buttons
+        layout.removeItem(self.button_row)
 
 class Program2(QMainWindow): 
     def __init__(self): 

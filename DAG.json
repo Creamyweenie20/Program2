@@ -1,0 +1,102 @@
+{
+  "nodes": [
+    {
+      "id": 0,
+      "op": "input",
+      "result": "B",
+      "parents": [],
+      "children": [
+        2
+      ]
+    },
+    {
+      "id": 1,
+      "op": "input",
+      "result": "C",
+      "parents": [],
+      "children": [
+        2
+      ]
+    },
+    {
+      "id": 2,
+      "op": "+",
+      "result": "A",
+      "parents": [
+        0,
+        1
+      ],
+      "children": [
+        6
+      ]
+    },
+    {
+      "id": 3,
+      "op": "input",
+      "result": "X",
+      "parents": [],
+      "children": [
+        5
+      ]
+    },
+    {
+      "id": 4,
+      "op": "input",
+      "result": "Y",
+      "parents": [],
+      "children": [
+        5
+      ]
+    },
+    {
+      "id": 5,
+      "op": "*",
+      "result": "foo_0",
+      "parents": [
+        3,
+        4
+      ],
+      "children": [
+        6
+      ]
+    },
+    {
+      "id": 6,
+      "op": "-",
+      "result": "D",
+      "parents": [
+        2,
+        5
+      ],
+      "children": []
+    },
+    {
+      "id": 7,
+      "op": "input",
+      "result": "H",
+      "parents": [],
+      "children": [
+        9
+      ]
+    },
+    {
+      "id": 8,
+      "op": "input",
+      "result": "F",
+      "parents": [],
+      "children": [
+        9
+      ]
+    },
+    {
+      "id": 9,
+      "op": "+",
+      "result": "foo_1",
+      "parents": [
+        7,
+        8
+      ],
+      "children": []
+    }
+  ]
+}

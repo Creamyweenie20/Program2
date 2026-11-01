@@ -49,7 +49,7 @@ def singleStaticAssign(path):
             SSA += line
             SSA += "\n"
 
-    with open("SSA.txt", "w") as f: 
-        f.write(SSA)
+    # with open("SSA.txt", "w") as f: 
+    #     f.write(SSA)
 
     return SSA
