@@ -23,7 +23,6 @@ def build_scene(dag):
         offset = (tallest - len(nodes)) * (BOX_H + Y_GAP) / 2
         for i, n in enumerate(nodes):
             pos[n.id] = (lvl * (BOX_W + X_GAP), offset + i * (BOX_H + Y_GAP))
-
     # Edges first, so boxes are drawn on top
     edge_pen = QPen(QColor("#aaaaaa"), 2)
     edge_brush = QBrush(QColor("#aaaaaa"))
