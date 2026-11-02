@@ -1,7 +1,11 @@
 A = B + C
 
-foo_0 = X * Y
+D = E * F
 
-D = A - foo_0
+G = H + I
 
-foo_1 = H + F
+J = A * D
+
+K = G + L
+
+M = J + K

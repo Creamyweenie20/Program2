@@ -5,7 +5,8 @@ from PySide6.QtGui import QGuiApplication, QFont
 from func import singleStaticAssign
 from Dag import Node, DAG
 import os 
-from dag_view import DagView
+from dag_view import *
+from schedules import * 
 
 class LogicSynthesis(QPushButton):
     def __init__(self, text = "Logic Synthesis", parent = None):
@@ -161,23 +162,74 @@ class HardwareSynthesis(QPushButton):
             layout.insertWidget(0, self.scrollArea)
 
         elif action == "Continue":
-            dag = DAG()
+            self.dag = DAG()
             for line in self.text.strip().splitlines():
                 if line.strip() == "":
                     continue
-                dag.add_statemnt(line.strip())
+                self.dag.add_statemnt(line.strip())
 
-            dag.save_json("DAG.json")
+            self.dag.save_json("DAG.json")
 
             layout = self._window.centralWidget().layout()
             self.clear_buttons(layout)            
             self.scrollArea.hide()                
 
-            self.dag_view = DagView(dag)
+            self.dag_view = DagView(self.dag)
             layout.insertWidget(0, self.dag_view)
             self.dag_view.fit()
 
+            self.button_row = QHBoxLayout()
+            self.schedules = ["ASAP", "ALAP"]
+            for schedule in self.schedules:
+                button = QPushButton(schedule)
+                button.clicked.connect(
+                    lambda _checked=False, l = schedule: self.schedule_buttons(l)
+                )
+                self.button_row.addWidget(button)
+            layout.addLayout(self.button_row)
 
+    def schedule_buttons(self, schedule): 
+        if schedule == "ASAP": 
+            layout = self._window.centralWidget().layout()
+            self.clear_buttons(layout)            
+            self.scrollArea.hide() 
+
+            t = ASAP(self.dag)
+            self.dag_view.setScene(build_scene(self.dag, t))
+            self.dag_view.fit()
+            layout.insertWidget(0, self.dag_view)
+            self.dag_view.fit()
+
+            self.button_row = QHBoxLayout()
+            self.schedules = ["ASAP", "ALAP"]
+            for s in self.schedules:
+                button = QPushButton(schedule)
+                button.clicked.connect(
+                    lambda _checked=False, l = s: self.schedule_buttons(l)
+                )
+                self.button_row.addWidget(button)
+            layout.addLayout(self.button_row)
+
+        elif schedule == "ALAP": 
+            layout = self._window.centralWidget().layout()
+            self.clear_buttons(layout)            
+            self.scrollArea.hide() 
+
+            t = ALAP(self.dag)
+            self.dag_view.setScene(build_scene(self.dag, t))
+            self.dag_view.fit()
+            layout.insertWidget(0, self.dag_view)
+            self.dag_view.fit()
+
+            self.button_row = QHBoxLayout()
+            self.schedules = ["ASAP", "ALAP"]
+            for s in self.schedules:
+                button = QPushButton(schedule)
+                button.clicked.connect(
+                    lambda _checked=False, l = s: self.schedule_buttons(l)
+                )
+                self.button_row.addWidget(button)
+            layout.addLayout(self.button_row)
 
     def clear_buttons(self, layout):
         while self.button_row.count():

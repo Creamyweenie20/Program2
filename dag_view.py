@@ -9,9 +9,12 @@ BOX_W, BOX_H = 120, 50
 X_GAP, Y_GAP = 90, 30
 
 
-def build_scene(dag):
+def build_scene(dag, t = None):
     scene = QGraphicsScene()
-    level = dag.levels()
+    if t == None: 
+        level = dag.levels()
+    else: 
+        level = {n.id: t[n.id] + (0 if n.op in ['input', 'const'] else 1) for n in dag.nodes}
 
     # Group nodes into columns
     columns = {}
@@ -76,9 +79,9 @@ def build_scene(dag):
 
 
 class DagView(QGraphicsView):
-    def __init__(self, dag):
+    def __init__(self, dag, t = None):
         super().__init__()
-        self._scene = build_scene(dag)     
+        self._scene = build_scene(dag, t)     
         self.setScene(self._scene)
         self.setRenderHint(QPainter.RenderHint.Antialiasing)
         self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)

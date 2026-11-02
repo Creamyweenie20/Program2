@@ -1,4 +1,8 @@
 A = B + C
-B = X * Y
-D = A - B 
-A = H + F
+D = A * E
+F = D + G
+H = F * I
+J = K + L
+M = N * O
+P = J + M
+Q = H + P
