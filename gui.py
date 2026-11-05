@@ -1,7 +1,8 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLabel, QFileDialog, QScrollArea
+from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLabel, QFileDialog, QScrollArea, QGridLayout
 from logic_synth.gui import MainWindow, FileWindow
 from PySide6.QtGui import QGuiApplication, QFont
+from PySide6.QtWidgets import QSpinBox, QFormLayout
 from func import singleStaticAssign
 from Dag import Node, DAG
 import os 
@@ -178,14 +179,32 @@ class HardwareSynthesis(QPushButton):
             layout.insertWidget(0, self.dag_view)
             self.dag_view.fit()
 
-            self.button_row = QHBoxLayout()
-            self.schedules = ["ASAP", "ALAP"]
-            for schedule in self.schedules:
+            # self.button_row = QHBoxLayout()
+            # self.schedules = ["ASAP", "ALAP"]
+
+            self.button_row = QGridLayout()
+            self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP' ]
+            i = 0
+            j = 0
+
+            for schedule in self.schedules: 
+                if i == 2: 
+                    j += 1
+                    i = 0 
                 button = QPushButton(schedule)
                 button.clicked.connect(
-                    lambda _checked=False, l = schedule: self.schedule_buttons(l)
-                )
-                self.button_row.addWidget(button)
+                                lambda _checked=False, l=schedule: self.schedule_buttons(l)
+                            )
+                self.button_row.addWidget(button, 1 + j, i)
+                i +=1 
+
+
+            # for schedule in self.schedules:
+            #     button = QPushButton(schedule)
+            #     button.clicked.connect(
+            #         lambda _checked=False, l = schedule: self.schedule_buttons(l)
+            #     )
+            #     self.button_row.addWidget(button)
             layout.addLayout(self.button_row)
 
     def schedule_buttons(self, schedule): 
@@ -200,14 +219,21 @@ class HardwareSynthesis(QPushButton):
             layout.insertWidget(0, self.dag_view)
             self.dag_view.fit()
 
-            self.button_row = QHBoxLayout()
-            self.schedules = ["ASAP", "ALAP"]
-            for s in self.schedules:
+            self.button_row = QGridLayout()
+            self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP' ]
+            i = 0
+            j = 0
+
+            for schedule in self.schedules: 
+                if i == 2: 
+                    j += 1
+                    i = 0 
                 button = QPushButton(schedule)
                 button.clicked.connect(
-                    lambda _checked=False, l = s: self.schedule_buttons(l)
-                )
-                self.button_row.addWidget(button)
+                                lambda _checked=False, l=schedule: self.schedule_buttons(l)
+                            )
+                self.button_row.addWidget(button, 1 + j, i)
+                i +=1 
             layout.addLayout(self.button_row)
 
         elif schedule == "ALAP": 
@@ -221,14 +247,118 @@ class HardwareSynthesis(QPushButton):
             layout.insertWidget(0, self.dag_view)
             self.dag_view.fit()
 
-            self.button_row = QHBoxLayout()
-            self.schedules = ["ASAP", "ALAP"]
-            for s in self.schedules:
+
+            self.button_row = QGridLayout()
+            self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP' ]
+            i = 0
+            j = 0
+
+            for schedule in self.schedules: 
+                if i == 2: 
+                    j += 1
+                    i = 0 
                 button = QPushButton(schedule)
                 button.clicked.connect(
-                    lambda _checked=False, l = s: self.schedule_buttons(l)
+                                lambda _checked=False, l=schedule: self.schedule_buttons(l)
+                            )
+                self.button_row.addWidget(button, 1 + j, i)
+                i +=1 
+            layout.addLayout(self.button_row)
+
+        elif schedule == "Constrained ASAP":
+            layout = self._window.centralWidget().layout()
+            self.clear_buttons(layout)
+            self.scrollArea.hide()
+
+            if layout.indexOf(self.dag_view) == -1:
+                layout.insertWidget(0, self.dag_view)
+
+            self.button_row = QGridLayout()
+            self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP' ]
+            i = 0
+            j = 0
+
+            for schedule in self.schedules: 
+                if i == 2: 
+                    j += 1
+                    i = 0 
+                button = QPushButton(schedule)
+                button.clicked.connect(
+                                lambda _checked=False, l=schedule: self.schedule_buttons(l)
+                            )
+                self.button_row.addWidget(button, 1 + j, i)
+                i +=1 
+
+            self.add_box = QSpinBox()
+            self.sub_box = QSpinBox()
+            self.mul_box = QSpinBox()
+            for box in (self.add_box, self.sub_box, self.mul_box):
+                box.setRange(1, 20)
+
+            self.button_row.addWidget(QLabel("Adders:"), 3, 0)
+            self.button_row.addWidget(self.add_box, 3, 1)
+            self.button_row.addWidget(QLabel("Subtractors:"), 4, 0)
+            self.button_row.addWidget(self.sub_box, 4, 1)
+            self.button_row.addWidget(QLabel("Multipliers:"), 5, 0)
+            self.button_row.addWidget(self.mul_box, 5, 1)
+
+            run = QPushButton("Run")
+            run.clicked.connect(
+                lambda _checked=False: self.dag_view.setScene(
+                    build_scene(self.dag, ASAP_con(self.dag, self.get_limits()))
                 )
-                self.button_row.addWidget(button)
+            )
+            run.clicked.connect(lambda _checked=False: self.dag_view.fit())
+            self.button_row.addWidget(run, 6, 0, 1, 2)
+
+            layout.addLayout(self.button_row)
+
+        elif schedule == "Constrained ALAP":
+            layout = self._window.centralWidget().layout()
+            self.clear_buttons(layout)
+            self.scrollArea.hide()
+
+            if layout.indexOf(self.dag_view) == -1:
+                layout.insertWidget(0, self.dag_view)
+
+            self.button_row = QGridLayout()
+            self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP' ]
+            i = 0
+            j = 0
+
+            for schedule in self.schedules: 
+                if i == 2: 
+                    j += 1
+                    i = 0 
+                button = QPushButton(schedule)
+                button.clicked.connect(
+                                lambda _checked=False, l=schedule: self.schedule_buttons(l)
+                            )
+                self.button_row.addWidget(button, 1 + j, i)
+                i +=1 
+
+            self.add_box = QSpinBox()
+            self.sub_box = QSpinBox()
+            self.mul_box = QSpinBox()
+            for box in (self.add_box, self.sub_box, self.mul_box):
+                box.setRange(1, 20)
+
+            self.button_row.addWidget(QLabel("Adders:"), 3, 0)
+            self.button_row.addWidget(self.add_box, 3, 1)
+            self.button_row.addWidget(QLabel("Subtractors:"), 4, 0)
+            self.button_row.addWidget(self.sub_box, 4, 1)
+            self.button_row.addWidget(QLabel("Multipliers:"), 5, 0)
+            self.button_row.addWidget(self.mul_box, 5, 1)
+
+            run = QPushButton("Run")
+            run.clicked.connect(
+                lambda _checked=False: self.dag_view.setScene(
+                    build_scene(self.dag, ALAP_con(self.dag, self.get_limits()))
+                )
+            )
+            run.clicked.connect(lambda _checked=False: self.dag_view.fit())
+            self.button_row.addWidget(run, 6, 0, 1, 2)
+
             layout.addLayout(self.button_row)
 
     def clear_buttons(self, layout):
@@ -236,6 +366,14 @@ class HardwareSynthesis(QPushButton):
             self.button_row.takeAt(0).widget().deleteLater()
         # Removes the row full of empty buttons
         layout.removeItem(self.button_row)
+
+    def get_limits(self):
+        limits = {
+            '+': self.add_box.value(),
+            '-': self.sub_box.value(),
+            '*': self.mul_box.value(),
+        }
+        return limits
 
 class Program2(QMainWindow): 
     def __init__(self): 

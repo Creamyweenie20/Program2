@@ -41,7 +41,7 @@
     },
     {
       "id": 4,
-      "op": "*",
+      "op": "+",
       "result": "D",
       "parents": [
         2,
@@ -83,15 +83,13 @@
     },
     {
       "id": 8,
-      "op": "*",
+      "op": "+",
       "result": "H",
       "parents": [
         6,
         7
       ],
-      "children": [
-        16
-      ]
+      "children": []
     },
     {
       "id": 9,
@@ -118,60 +116,6 @@
       "parents": [
         9,
         10
-      ],
-      "children": [
-        15
-      ]
-    },
-    {
-      "id": 12,
-      "op": "input",
-      "result": "N",
-      "parents": [],
-      "children": [
-        14
-      ]
-    },
-    {
-      "id": 13,
-      "op": "input",
-      "result": "O",
-      "parents": [],
-      "children": [
-        14
-      ]
-    },
-    {
-      "id": 14,
-      "op": "*",
-      "result": "M",
-      "parents": [
-        12,
-        13
-      ],
-      "children": [
-        15
-      ]
-    },
-    {
-      "id": 15,
-      "op": "+",
-      "result": "P",
-      "parents": [
-        11,
-        14
-      ],
-      "children": [
-        16
-      ]
-    },
-    {
-      "id": 16,
-      "op": "+",
-      "result": "Q",
-      "parents": [
-        8,
-        15
       ],
       "children": []
     }
