@@ -75,3 +75,15 @@ def ALAP_con(dag, limits, L = None):
             t[n.id] = min((t[c.id] for c in n.child), default = L)
 
     return t 
+
+def OPC(dag): 
+    t = {}
+    i = 1
+    for n in dag.topo_order(): 
+        if n.op in ['input', 'const']:
+            t[n.id] = 0
+        else: 
+            t[n.id] = i
+            i += 1
+
+    return t 
