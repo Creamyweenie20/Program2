@@ -8,6 +8,8 @@ from Dag import Node, DAG
 import os 
 from dag_view import *
 from schedules import * 
+from Generator import * 
+from gen_top import write_top
 
 class LogicSynthesis(QPushButton):
     def __init__(self, text = "Logic Synthesis", parent = None):
@@ -223,6 +225,9 @@ class HardwareSynthesis(QPushButton):
             layout.insertWidget(0, self.dag_view)
             self.dag_view.fit()
 
+            self.save_verilog(t, "ASAP")
+
+
             self.button_row = QGridLayout()
             self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP', 'OPC' ]
             i = 0
@@ -255,6 +260,7 @@ class HardwareSynthesis(QPushButton):
             layout.insertWidget(0, self.dag_view)
             self.dag_view.fit()
 
+            self.save_verilog(t, "ALAP")
 
             self.button_row = QGridLayout()
             self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP', 'OPC' ]
@@ -323,7 +329,7 @@ class HardwareSynthesis(QPushButton):
                     build_scene(self.dag, ASAP_con(self.dag, self.get_limits()))
                 )
             )
-            run.clicked.connect(lambda _checked=False: self.dag_view.fit())
+            run.clicked.connect(lambda _checked=False: self.run_constrained(ASAP_con, "ASAP_con"))
             self.button_row.addWidget(run, 7, 0, 1, 2)
 
             # self.button_row.addWidget(self.button_opc, 3, 0, 1, 2)  
@@ -375,7 +381,7 @@ class HardwareSynthesis(QPushButton):
                     build_scene(self.dag, ALAP_con(self.dag, self.get_limits()))
                 )
             )
-            run.clicked.connect(lambda _checked=False: self.dag_view.fit())
+            run.clicked.connect(lambda _checked=False: self.run_constrained(ALAP_con, "ALAP_con"))
             self.button_row.addWidget(run, 7, 0, 1, 2)
 
             # self.button_row.addWidget(self.button_opc, 3, 0, 1, 2)  
@@ -396,7 +402,7 @@ class HardwareSynthesis(QPushButton):
             layout.insertWidget(0, self.dag_view)
             self.dag_view.fit()
 
-            
+            self.save_verilog(t, "OPC")
 
             self.button_row = QGridLayout()
             self.schedules = ['ASAP', 'ALAP', 'Constrained ASAP', 'Constrained ALAP', 'OPC' ]
@@ -455,6 +461,19 @@ class HardwareSynthesis(QPushButton):
             '*': self.mul_box.value(),
         }
         return limits
+
+    def save_verilog(self, sched, name):
+        """Writes the core (<name>.v) and its top module (<name>_top.v)."""
+        with open(f"{name}.v", "w") as f:
+            f.write(write_generator(self.dag, sched, name))
+        with open(f"{name}_top.v", "w") as f:
+            f.write(write_top(self.dag, sched, core_name=name, top_name=f"{name}_top"))
+
+    def run_constrained(self, scheduler, name):
+        t = scheduler(self.dag, self.get_limits())
+        self.dag_view.setScene(build_scene(self.dag, t))
+        self.dag_view.fit()
+        self.save_verilog(t, name)
 
 class Program2(QMainWindow): 
     def __init__(self): 
