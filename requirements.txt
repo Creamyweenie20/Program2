@@ -1,0 +1,9 @@
+# Program2 runtime dependencies. Install with: pip install -r requirements.txt
+
+# Boolean synthesis GUI (Program2 imports logic_synth.gui).
+# The [gui] extra pulls in PySide6. Pin to a release tag or commit, not a branch.
+logic-synth[gui] @ git+https://github.com/<user>/<repo>.git@v0.1.0
+
+# Imported directly by Program2 (dag_view.py, gui.py), so declared here too
+numpy
+PySide6>=6.5
